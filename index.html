@@ -515,12 +515,10 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 <!-- Модалка-страница для материалов -->
 <div class="material-page-overlay" id="material-page-overlay" onclick="if(event.target===this) closeMaterialPage()">
   <div class="material-page" id="material-page-container">
-    <!-- Прелоадер -->
     <div class="material-preloader" id="material-preloader">
       <div class="loader"></div>
       <p style="color:var(--text-muted);">Загружаем материал...</p>
     </div>
-    <!-- Контент (скрыт пока) -->
     <div id="material-content-wrapper" style="display:none;">
       <button class="material-close" onclick="closeMaterialPage()">✕</button>
       <div class="material-icon" id="material-icon"></div>
@@ -615,8 +613,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   async function handleLogout() {
     await supabaseClient.auth.signOut();
     updateNavButtons();
-    document.getElementById('active-count').textContent = '0'; // сброс
-    // перезапросить счетчик, если нужно
+    document.getElementById('active-count').textContent = '0';
     updateActiveCount();
   }
 
@@ -656,7 +653,6 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     const okEl = document.getElementById('auth-success');
     const btn = document.getElementById('auth-submit-btn');
 
-    // Дополнительная валидация на случай обхода oninput
     if (!/^[a-z0-9_]+$/i.test(rawNick)) {
       errEl.textContent = 'Ник содержит недопустимые символы';
       errEl.style.display = 'block';
@@ -813,12 +809,10 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     const preloader = document.getElementById('material-preloader');
     const wrapper = document.getElementById('material-content-wrapper');
 
-    // Показываем прелоадер, скрываем контент
     wrapper.style.display = 'none';
     preloader.style.display = 'flex';
     overlay.classList.add('open');
 
-    // Имитация загрузки (можно убрать, если контент статичный, но для UX хорошо)
     setTimeout(() => {
       document.getElementById('material-icon').textContent = page.icon;
       document.getElementById('material-title').textContent = page.title;
@@ -845,14 +839,13 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     const countEl = document.getElementById('active-count');
     try {
       const { count, error } = await supabaseClient
-        .from('profiles')
+        .from('assistants')
         .select('*', { count: 'exact', head: true });
       if (!error && count !== null) {
         animateValue(countEl, 0, count, 800);
         return;
       }
     } catch (e) {}
-    // fallback
     animateValue(countEl, 0, 0, 400);
   }
 
