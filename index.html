@@ -70,7 +70,30 @@ a{ color: inherit; text-decoration: none; }
 .topnav .brand .mark{ width:26px; height:26px; border-radius:8px; background: linear-gradient(135deg, var(--accent), #7a1230); display:flex; align-items:center; justify-content:center; font-size:13px; box-shadow: 0 4px 14px rgba(200,30,77,0.35); }
 .topnav nav{ display:flex; gap:28px; font-size:13.5px; color: var(--text-secondary); }
 .topnav nav a:hover{ color: var(--text-primary); }
-.topnav .nav-cta{ display:flex; gap:10px; }
+.topnav .nav-cta{ display:flex; gap:10px; align-items:center; }
+
+/* Бургер-иконка */
+.burger{ display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:4px; }
+.burger span{ display:block; width:20px; height:2px; background:var(--text-secondary); transition:0.2s; }
+.burger.open span:nth-child(1){ transform:rotate(45deg) translate(5px,5px); }
+.burger.open span:nth-child(2){ opacity:0; }
+.burger.open span:nth-child(3){ transform:rotate(-45deg) translate(5px,-5px); }
+
+/* Мобильное меню */
+.mobile-nav{
+  display:none;
+  position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg-base); z-index:100; flex-direction:column; align-items:center; justify-content:center; gap:32px; font-size:18px;
+}
+.mobile-nav.open{ display:flex; }
+.mobile-nav a{ color:var(--text-secondary); }
+.mobile-nav a:hover{ color:var(--text-primary); }
+.mobile-nav .close-btn{ position:absolute; top:24px; right:24px; background:none; border:none; color:var(--text-muted); font-size:24px; cursor:pointer; }
+
+@media (max-width: 760px){
+  .topnav nav{ display:none; }
+  .burger{ display:flex; }
+  .mobile-nav{ display:none; }
+}
 
 /* ===== HERO ===== */
 .hero{ padding: 96px 28px 70px; position: relative; overflow:hidden; border-bottom: 1px solid var(--border-soft); }
@@ -125,6 +148,8 @@ a{ color: inherit; text-decoration: none; }
 .btn-primary:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
 .btn-secondary{ background: var(--bg-surface-raised); color: var(--text-primary); border-color: var(--border); }
 .btn-secondary:hover{ border-color: var(--accent-border); color: var(--accent-hover); }
+.btn-danger{ background: transparent; color: var(--text-muted); border-color: var(--border); }
+.btn-danger:hover{ border-color: var(--accent); color: var(--accent-hover); }
 
 /* Portal preview cards in hero */
 .portal-row{ display:grid; grid-template-columns: 1fr 1fr; gap:18px; text-align:left; }
@@ -177,6 +202,7 @@ section{ padding: 80px 28px; border-bottom: 1px solid var(--border-soft); }
 .res-card p{ font-size:12.5px; color: var(--text-muted); }
 
 /* ===== TEAM ===== */
+.team-section{ background: radial-gradient(ellipse at 50% 0%, rgba(200,30,77,0.05), transparent 60%); }
 .team-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .team-card{
   background: var(--bg-surface); border:1px solid var(--border); border-radius: var(--radius-md);
@@ -203,6 +229,15 @@ section{ padding: 80px 28px; border-bottom: 1px solid var(--border-soft); }
 .team-card.founder .trole{ color: var(--role-founder); }
 .team-card .tdesc{ font-size:13px; color: var(--text-secondary); }
 
+/* Role tooltip */
+.role-tooltip{
+  position:absolute; left:34px; top:10px;
+  background: var(--bg-surface-raised); border:1px solid var(--border); border-radius:6px;
+  padding:4px 10px; font-size:11px; color: var(--text-secondary); white-space:nowrap;
+  opacity:0; pointer-events:none; transition:0.2s;
+}
+.team-card:hover .role-tooltip{ opacity:1; }
+
 /* ===== FOOTER CTA ===== */
 .final-cta{ text-align:center; padding: 90px 28px; }
 .final-cta h2{ font-family: var(--font-display); font-size: clamp(30px,5vw,46px); font-weight:600; margin-bottom:18px; }
@@ -225,6 +260,9 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 .field label{ font-size:12.5px; color: var(--text-secondary); }
 .field input{ background: var(--bg-base); border:1px solid var(--border); color: var(--text-primary); padding: 11px 13px; border-radius: var(--radius-sm); font-size:13.5px; font-family: var(--font-body); width:100%; }
 .field input:focus{ outline:none; border-color: var(--accent-border); box-shadow: 0 0 0 3px var(--accent-soft); }
+.field input.input-error{ border-color: #e5484d; }
+.field .field-hint{ font-size:11px; color:#e5484d; margin-top:2px; display:none; }
+
 .modal-box .btn-primary{ width:100%; justify-content:center; margin-top:6px; }
 .modal-error{ font-size:12.5px; color: #e5484d; margin-top:10px; display:none; }
 .modal-success{ font-size:12.5px; color: var(--role-manager); margin-top:10px; display:none; }
@@ -285,9 +323,13 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 .material-page .material-content p{
   margin-bottom:12px;
 }
+.material-preloader{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px;
+}
+.material-preloader .loader{ width:36px; height:36px; border:3px solid var(--border); border-top-color: var(--accent); border-radius:50%; animation: spin 0.7s linear infinite; margin-bottom:16px; }
 
+/* Адаптив */
 @media (max-width: 760px){
-  .topnav nav{ display:none; }
   .portal-row{ grid-template-columns: 1fr; }
   .about-grid, .team-grid{ grid-template-columns: 1fr; }
   .material-page{ padding: 28px 22px; }
@@ -306,7 +348,20 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   </nav>
   <div class="nav-cta">
     <button class="btn btn-secondary" id="nav-auth-btn" onclick="handleEnterDashboard()">Войти</button>
+    <button class="btn btn-danger" id="nav-logout-btn" style="display:none;" onclick="handleLogout()">Выйти</button>
+    <button class="burger" id="burger-btn" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
   </div>
+</div>
+
+<!-- Мобильная навигация -->
+<div class="mobile-nav" id="mobile-nav">
+  <button class="close-btn" id="mobile-close-btn">✕</button>
+  <a href="#about">О проекте</a>
+  <a href="#services">Сервисы</a>
+  <a href="#resources">Материалы</a>
+  <a href="#team">Команда</a>
 </div>
 
 <div class="hero">
@@ -319,7 +374,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       <button class="btn btn-secondary" id="hero-results-btn" onclick="handleEnterResults()">Открыть Results</button>
     </div>
     <div class="hero-stats">
-      <div class="stat-badge"><span class="stat-dot"></span> <span id="active-count">…</span> ассистентов в системе</div>
+      <div class="stat-badge"><span class="stat-dot"></span> <span id="active-count">0</span> ассистентов зарегистрировано</div>
     </div>
 
     <div class="portal-row" id="services">
@@ -385,35 +440,25 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     </div>
     <div class="res-grid">
       <div class="res-card" onclick="openMaterialPage('reglament')">
-        <div class="ricon">📜</div>
-        <h4>Регламенты<span class="res-arrow">→</span></h4>
-        <p>Правила работы Civil Team</p>
+        <div class="ricon">📜</div><h4>Регламенты<span class="res-arrow">→</span></h4><p>Правила работы Civil Team</p>
       </div>
       <div class="res-card" onclick="openMaterialPage('instructions')">
-        <div class="ricon">📘</div>
-        <h4>Инструкции<span class="res-arrow">→</span></h4>
-        <p>Как пользоваться Dashboard</p>
+        <div class="ricon">📘</div><h4>Инструкции<span class="res-arrow">→</span></h4><p>Как пользоваться Dashboard</p>
       </div>
       <div class="res-card" onclick="openMaterialPage('guides')">
-        <div class="ricon">🧭</div>
-        <h4>Руководства<span class="res-arrow">→</span></h4>
-        <p>Гайды по ролям и задачам</p>
+        <div class="ricon">🧭</div><h4>Руководства<span class="res-arrow">→</span></h4><p>Гайды по ролям и задачам</p>
       </div>
       <div class="res-card" onclick="openMaterialPage('faq')">
-        <div class="ricon">❓</div>
-        <h4>FAQ<span class="res-arrow">→</span></h4>
-        <p>Частые вопросы ассистентов</p>
+        <div class="ricon">❓</div><h4>FAQ<span class="res-arrow">→</span></h4><p>Частые вопросы ассистентов</p>
       </div>
       <div class="res-card" onclick="openMaterialPage('links')">
-        <div class="ricon">🔗</div>
-        <h4>Полезные ссылки<span class="res-arrow">→</span></h4>
-        <p>Форум, чаты, документы</p>
+        <div class="ricon">🔗</div><h4>Полезные ссылки<span class="res-arrow">→</span></h4><p>Форум, чаты, документы</p>
       </div>
     </div>
   </div>
 </section>
 
-<section id="team">
+<section id="team" class="team-section">
   <div class="wrap">
     <div class="sec-head">
       <div class="eyebrow"><span class="dot"></span>Команда</div>
@@ -426,6 +471,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
         <div class="tname">sky.</div>
         <div class="trole">Head of Civil</div>
         <div class="tdesc">Отвечает за организационную структуру Civil Team, распределение BWC и работу всей команды ассистентов.</div>
+        <div class="role-tooltip">Полный доступ — управление командой</div>
       </div>
     </div>
   </div>
@@ -448,7 +494,11 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     <h3 id="auth-modal-title">Вход в Civil ID</h3>
     <p class="modal-sub" id="auth-modal-sub">Войди под своим игровым ником — мы откроем нужный сервис с активной сессией.</p>
     <form id="auth-form" onsubmit="handleAuthSubmit(event)">
-      <div class="field"><label>Игровой ник</label><input type="text" id="auth-nick" required placeholder="Введи свой ник" autocomplete="username"></div>
+      <div class="field">
+        <label>Игровой ник</label>
+        <input type="text" id="auth-nick" required placeholder="Введи свой ник" autocomplete="username" oninput="validateNickInput()">
+        <span class="field-hint" id="nick-hint">Допустимы только латинские буквы, цифры и _</span>
+      </div>
       <div class="field"><label>Пароль</label><input type="password" id="auth-password" required placeholder="••••••••" autocomplete="current-password"></div>
       <button type="submit" class="btn btn-primary" id="auth-submit-btn">Войти</button>
       <div class="modal-error" id="auth-error"></div>
@@ -464,12 +514,20 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 
 <!-- Модалка-страница для материалов -->
 <div class="material-page-overlay" id="material-page-overlay" onclick="if(event.target===this) closeMaterialPage()">
-  <div class="material-page">
-    <button class="material-close" onclick="closeMaterialPage()">✕</button>
-    <div class="material-icon" id="material-icon"></div>
-    <h2 id="material-title"></h2>
-    <p class="material-subtitle" id="material-subtitle"></p>
-    <div class="material-content" id="material-content"></div>
+  <div class="material-page" id="material-page-container">
+    <!-- Прелоадер -->
+    <div class="material-preloader" id="material-preloader">
+      <div class="loader"></div>
+      <p style="color:var(--text-muted);">Загружаем материал...</p>
+    </div>
+    <!-- Контент (скрыт пока) -->
+    <div id="material-content-wrapper" style="display:none;">
+      <button class="material-close" onclick="closeMaterialPage()">✕</button>
+      <div class="material-icon" id="material-icon"></div>
+      <h2 id="material-title"></h2>
+      <p class="material-subtitle" id="material-subtitle"></p>
+      <div class="material-content" id="material-content"></div>
+    </div>
   </div>
 </div>
 
@@ -478,20 +536,33 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   const SUPABASE_URL = "https://jdrepnjvvyzaiohihvvw.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkcmVwbmp2dnl6YWlvaGlodnZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MDczODUsImV4cCI6MjA5NzI4MzM4NX0.Byex7T_qRiiVBmFMD3QeS8tALx5k1ZIV34O2QDrjjbI";
   const DASHBOARD_URL = "https://civil-dashboard.vercel.app";
-  const RESULTS_URL = null; // замените на реальный URL когда будет готов
+  const RESULTS_URL = null;
 
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let pendingTarget = null;
 
-  let pendingTarget = null; // 'dashboard' | 'results'
-
-  // ===== Sticky nav shadow on scroll =====
+  // ===== Sticky nav shadow =====
   window.addEventListener('scroll', () => {
-    const nav = document.getElementById('topnav');
-    if (window.scrollY > 10) {
-      nav.classList.add('scrolled');
-    } else {
-      nav.classList.remove('scrolled');
-    }
+    document.getElementById('topnav').classList.toggle('scrolled', window.scrollY > 10);
+  });
+
+  // ===== Мобильное меню =====
+  const burgerBtn = document.getElementById('burger-btn');
+  const mobileNav = document.getElementById('mobile-nav');
+  const mobileCloseBtn = document.getElementById('mobile-close-btn');
+  burgerBtn.addEventListener('click', () => {
+    burgerBtn.classList.toggle('open');
+    mobileNav.classList.toggle('open');
+  });
+  mobileCloseBtn.addEventListener('click', () => {
+    burgerBtn.classList.remove('open');
+    mobileNav.classList.remove('open');
+  });
+  mobileNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      burgerBtn.classList.remove('open');
+      mobileNav.classList.remove('open');
+    });
   });
 
   // ===== SSO =====
@@ -528,7 +599,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 
   async function handleEnterResults() {
     if (!RESULTS_URL) {
-      openMaterialPage('results-unavailable'); // покажем заглушку через страницу материалов
+      openMaterialPage('results-unavailable');
       return;
     }
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -539,6 +610,14 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       pendingTarget = 'results';
       openAuthModal();
     }
+  }
+
+  async function handleLogout() {
+    await supabaseClient.auth.signOut();
+    updateNavButtons();
+    document.getElementById('active-count').textContent = '0'; // сброс
+    // перезапросить счетчик, если нужно
+    updateActiveCount();
   }
 
   // ===== Модалка логина =====
@@ -556,6 +635,19 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     hideLoadingState();
   }
 
+  function validateNickInput() {
+    const input = document.getElementById('auth-nick');
+    const hint = document.getElementById('nick-hint');
+    const regex = /^[a-z0-9_]*$/i;
+    if (!regex.test(input.value)) {
+      input.classList.add('input-error');
+      hint.style.display = 'block';
+    } else {
+      input.classList.remove('input-error');
+      hint.style.display = 'none';
+    }
+  }
+
   async function handleAuthSubmit(e) {
     e.preventDefault();
     const rawNick = document.getElementById('auth-nick').value.trim();
@@ -563,6 +655,14 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     const errEl = document.getElementById('auth-error');
     const okEl = document.getElementById('auth-success');
     const btn = document.getElementById('auth-submit-btn');
+
+    // Дополнительная валидация на случай обхода oninput
+    if (!/^[a-z0-9_]+$/i.test(rawNick)) {
+      errEl.textContent = 'Ник содержит недопустимые символы';
+      errEl.style.display = 'block';
+      return;
+    }
+
     errEl.style.display = 'none';
     okEl.style.display = 'none';
     btn.disabled = true;
@@ -602,8 +702,8 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     errEl.style.display = 'none';
     okEl.style.display = 'none';
 
-    if (!rawNick) {
-      errEl.textContent = 'Сначала введи свой ник';
+    if (!rawNick || !/^[a-z0-9_]+$/i.test(rawNick)) {
+      errEl.textContent = 'Введи корректный ник';
       errEl.style.display = 'block';
       return;
     }
@@ -624,7 +724,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     }
   }
 
-  // ===== Содержимое страниц материалов =====
+  // ===== Материалы (страницы) =====
   const materialPages = {
     'reglament': {
       icon: '📜',
@@ -709,18 +809,30 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   function openMaterialPage(key) {
     const page = materialPages[key];
     if (!page) return;
-    document.getElementById('material-icon').textContent = page.icon;
-    document.getElementById('material-title').textContent = page.title;
-    document.getElementById('material-subtitle').textContent = page.subtitle;
-    document.getElementById('material-content').innerHTML = page.content;
-    document.getElementById('material-page-overlay').classList.add('open');
+    const overlay = document.getElementById('material-page-overlay');
+    const preloader = document.getElementById('material-preloader');
+    const wrapper = document.getElementById('material-content-wrapper');
+
+    // Показываем прелоадер, скрываем контент
+    wrapper.style.display = 'none';
+    preloader.style.display = 'flex';
+    overlay.classList.add('open');
+
+    // Имитация загрузки (можно убрать, если контент статичный, но для UX хорошо)
+    setTimeout(() => {
+      document.getElementById('material-icon').textContent = page.icon;
+      document.getElementById('material-title').textContent = page.title;
+      document.getElementById('material-subtitle').textContent = page.subtitle;
+      document.getElementById('material-content').innerHTML = page.content;
+      preloader.style.display = 'none';
+      wrapper.style.display = 'block';
+    }, 300);
   }
 
   function closeMaterialPage() {
     document.getElementById('material-page-overlay').classList.remove('open');
   }
 
-  // Закрытие по Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeMaterialPage();
@@ -728,38 +840,58 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     }
   });
 
-  // ===== Реальный счётчик ассистентов =====
+  // ===== Счётчик зарегистрированных ассистентов =====
   async function updateActiveCount() {
+    const countEl = document.getElementById('active-count');
     try {
-      // Попытка получить количество активных ассистентов из таблицы profiles
       const { count, error } = await supabaseClient
         .from('profiles')
         .select('*', { count: 'exact', head: true });
       if (!error && count !== null) {
-        document.getElementById('active-count').textContent = count;
+        animateValue(countEl, 0, count, 800);
         return;
       }
-    } catch (e) {
-      // fallback — оставляем заглушку или 0
-    }
-    // Если запрос не удался, показываем 0
-    document.getElementById('active-count').textContent = '0';
+    } catch (e) {}
+    // fallback
+    animateValue(countEl, 0, 0, 400);
   }
 
-  // ===== Обновление кнопки в навбаре =====
-  async function updateNavButton() {
+  function animateValue(el, start, end, duration) {
+    const startTime = performance.now();
+    function update(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const current = Math.floor(progress * (end - start) + start);
+      el.textContent = current;
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      }
+    }
+    requestAnimationFrame(update);
+  }
+
+  // ===== Обновление кнопок навбара =====
+  async function updateNavButtons() {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    const btn = document.getElementById('nav-auth-btn');
+    const authBtn = document.getElementById('nav-auth-btn');
+    const logoutBtn = document.getElementById('nav-logout-btn');
     const heroDashBtn = document.getElementById('hero-dash-btn');
     if (session) {
-      btn.textContent = 'В Dashboard';
+      authBtn.textContent = 'В Dashboard';
+      authBtn.style.display = 'inline-flex';
+      logoutBtn.style.display = 'inline-flex';
+      heroDashBtn.textContent = 'Открыть Dashboard →';
+    } else {
+      authBtn.textContent = 'Войти';
+      authBtn.style.display = 'inline-flex';
+      logoutBtn.style.display = 'none';
       heroDashBtn.textContent = 'Открыть Dashboard →';
     }
   }
 
   // ===== Инициализация =====
   (async () => {
-    await updateNavButton();
+    await updateNavButtons();
     await updateActiveCount();
   })();
 </script>
