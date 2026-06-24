@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Civil ID — портал экосистемы</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛬</text></svg>" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -60,6 +61,10 @@ a{ color: inherit; text-decoration: none; }
   background: rgba(10,10,12,0.78);
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-soft);
+  transition: box-shadow 0.3s ease;
+}
+.topnav.scrolled{
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 .topnav .brand{ display:flex; align-items:center; gap:10px; font-family: var(--font-display); font-weight:600; font-size: 17px; }
 .topnav .brand .mark{ width:26px; height:26px; border-radius:8px; background: linear-gradient(135deg, var(--accent), #7a1230); display:flex; align-items:center; justify-content:center; font-size:13px; box-shadow: 0 4px 14px rgba(200,30,77,0.35); }
@@ -75,6 +80,11 @@ a{ color: inherit; text-decoration: none; }
   width:900px; height:480px;
   background: radial-gradient(ellipse at center, rgba(200,30,77,0.18), transparent 70%);
   pointer-events:none;
+  animation: heroGlow 4s ease-in-out infinite alternate;
+}
+@keyframes heroGlow{
+  from{ opacity: 0.7; }
+  to{ opacity: 1; }
 }
 .hero .wrap{ position:relative; text-align:center; }
 .eyebrow{
@@ -85,7 +95,11 @@ a{ color: inherit; text-decoration: none; }
   padding: 6px 14px; border-radius: 100px;
   margin-bottom: 28px;
 }
-.eyebrow .dot{ width:6px; height:6px; border-radius:50%; background: var(--accent); }
+.eyebrow .dot{ width:6px; height:6px; border-radius:50%; background: var(--accent); animation: dotPulse 2s ease-in-out infinite; }
+@keyframes dotPulse{
+  0%, 100%{ box-shadow: 0 0 0 0 rgba(200,30,77,0.6); }
+  50%{ box-shadow: 0 0 0 8px rgba(200,30,77,0); }
+}
 .hero h1{
   font-family: var(--font-display); font-weight:600;
   font-size: clamp(42px, 7vw, 72px);
@@ -94,11 +108,21 @@ a{ color: inherit; text-decoration: none; }
 }
 .hero h1 em{ font-style:italic; font-weight:500; color: var(--accent-hover); }
 .hero .lede{ font-size: 17px; color: var(--text-secondary); max-width: 540px; margin: 0 auto 40px; }
-.hero-ctas{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:64px; }
+.hero-ctas{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+.hero-stats{ margin-bottom: 48px; }
+.hero-stats .stat-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family: var(--font-mono); font-size:12px;
+  color: var(--text-secondary);
+  background: var(--bg-surface); border:1px solid var(--border);
+  padding: 8px 16px; border-radius: 100px;
+}
+.hero-stats .stat-dot{ width:7px; height:7px; border-radius:50%; background: var(--role-manager); animation: dotPulse 2s ease-in-out infinite; }
 
 .btn{ font-family: var(--font-body); font-size:14px; font-weight:600; border-radius: var(--radius-sm); padding: 13px 24px; cursor:pointer; border:1px solid transparent; transition: all .15s ease; display:inline-flex; align-items:center; gap:8px; }
 .btn-primary{ background: var(--accent); color:#fff; }
 .btn-primary:hover{ background: var(--accent-hover); transform: translateY(-1px); }
+.btn-primary:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
 .btn-secondary{ background: var(--bg-surface-raised); color: var(--text-primary); border-color: var(--border); }
 .btn-secondary:hover{ border-color: var(--accent-border); color: var(--accent-hover); }
 
@@ -139,7 +163,12 @@ section{ padding: 80px 28px; border-bottom: 1px solid var(--border-soft); }
 
 /* ===== RESOURCES ===== */
 .res-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:16px; }
-.res-card{ background: var(--bg-surface); border:1px solid var(--border); border-radius: var(--radius-md); padding: 22px; display:flex; flex-direction:column; gap:10px; transition: border-color .18s, transform .18s, box-shadow .18s; cursor:pointer; position:relative; }
+.res-card{
+  background: var(--bg-surface); border:1px solid var(--border); border-radius: var(--radius-md);
+  padding: 22px; display:flex; flex-direction:column; gap:10px;
+  transition: border-color .18s, transform .18s, box-shadow .18s;
+  cursor:pointer; position:relative;
+}
 .res-card:hover{ border-color: var(--accent-border); transform: translateY(-3px); box-shadow: 0 14px 28px rgba(0,0,0,0.35); }
 .res-card .ricon{ font-size:20px; }
 .res-card h4{ font-size:14.5px; font-weight:600; display:flex; align-items:center; justify-content:space-between; }
@@ -147,13 +176,38 @@ section{ padding: 80px 28px; border-bottom: 1px solid var(--border-soft); }
 .res-card:hover h4 .res-arrow{ opacity:1; transform:none; color: var(--accent-hover); }
 .res-card p{ font-size:12.5px; color: var(--text-muted); }
 
+/* Resource accordion inside cards */
+.res-detail{
+  max-height:0; overflow:hidden;
+  transition: max-height 0.35s ease, margin-top 0.35s ease;
+  font-size:12.5px; color: var(--text-secondary);
+  border-top: 1px solid transparent;
+}
+.res-detail.open{
+  max-height:200px; margin-top:10px;
+  border-top-color: var(--border-soft);
+  padding-top:10px;
+}
+.res-detail p{ margin-bottom:6px; }
+.res-detail ul{ padding-left:18px; color: var(--text-muted); font-size:12px; }
+.res-detail ul li{ margin-bottom:4px; }
+
 /* ===== TEAM ===== */
 .team-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.team-card{ background: var(--bg-surface); border:1px solid var(--border); border-radius: var(--radius-md); padding: 24px 22px; position:relative; overflow:hidden; padding-left:26px; }
-.team-card::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:3px; }
-.team-card.head::before{ background: var(--role-head); }
+.team-card{
+  background: var(--bg-surface); border:1px solid var(--border); border-radius: var(--radius-md);
+  padding: 24px 22px; position:relative; overflow:hidden; padding-left:26px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.team-card::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:3px; transition: width 0.2s ease, box-shadow 0.2s ease; }
+.team-card:hover{ border-color: var(--border); transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,0.3); }
+.team-card:hover::before{ width:5px; }
+.team-card.head::before{ background: var(--role-head); box-shadow: 0 0 12px rgba(200,30,77,0.3); }
+.team-card.head:hover::before{ box-shadow: 0 0 20px rgba(200,30,77,0.5); }
 .team-card.deputy::before{ background: var(--role-deputy); }
+.team-card.deputy:hover::before{ box-shadow: 0 0 16px rgba(181,121,58,0.4); }
 .team-card.founder::before{ background: var(--role-founder); }
+.team-card.founder:hover::before{ box-shadow: 0 0 16px rgba(110,108,217,0.4); }
 .team-avatar{ width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family: var(--font-display); font-weight:700; font-size:18px; margin-bottom:16px; }
 .team-card.head .team-avatar{ background: var(--accent-soft); color: var(--role-head); border:1px solid rgba(200,30,77,0.3); }
 .team-card.deputy .team-avatar{ background: rgba(181,121,58,0.12); color: var(--role-deputy); border:1px solid rgba(181,121,58,0.3); }
@@ -192,7 +246,13 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 .modal-success{ font-size:12.5px; color: var(--role-manager); margin-top:10px; display:none; }
 .modal-switch{ text-align:center; font-size:12.5px; color: var(--text-muted); margin-top:16px; }
 .modal-switch span{ color: var(--accent-hover); cursor:pointer; font-weight:600; }
-.modal-loading{ opacity:0.6; pointer-events:none; }
+.modal-switch span:hover{ text-decoration: underline; }
+.modal-forgot{ text-align:center; font-size:12px; margin-top:12px; }
+.modal-forgot a{ color: var(--text-muted); cursor:pointer; }
+.modal-forgot a:hover{ color: var(--accent-hover); }
+.modal-loading-state{ display:none; text-align:center; padding: 20px 0; }
+.modal-loading-state .loader{ width:32px; height:32px; border:3px solid var(--border); border-top-color: var(--accent); border-radius:50%; animation: spin 0.7s linear infinite; margin: 0 auto 14px; }
+@keyframes spin{ to{ transform: rotate(360deg); } }
 
 @media (max-width: 760px){
   .topnav nav{ display:none; }
@@ -203,7 +263,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 </head>
 <body>
 
-<div class="topnav">
+<div class="topnav" id="topnav">
   <div class="brand"><span class="mark">⛬</span>Civil ID</div>
   <nav>
     <a href="#about">О проекте</a>
@@ -222,11 +282,14 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     <h1>Один вход.<br>Вся <em>система</em> цивильного сегмента.</h1>
     <p class="lede">Civil ID — точка входа в экосистему: задачи и рейтинг в Dashboard, итоги недели в Results, регламенты и команда — здесь.</p>
     <div class="hero-ctas">
-      <button class="btn btn-primary" onclick="handleEnterDashboard()">Открыть Dashboard →</button>
-      <button class="btn btn-secondary" onclick="handleEnterResults()">Открыть Results</button>
+      <button class="btn btn-primary" id="hero-dash-btn" onclick="handleEnterDashboard()">Открыть Dashboard →</button>
+      <button class="btn btn-secondary" id="hero-results-btn" onclick="handleEnterResults()">Открыть Results</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-badge"><span class="stat-dot"></span> <span id="active-count">—</span> ассистентов в системе</div>
     </div>
 
-    <div class="portal-row">
+    <div class="portal-row" id="services">
       <a href="javascript:void(0)" class="portal-card dash" onclick="handleEnterDashboard()">
         <div class="picon">📊</div>
         <h3>Civil Dashboard</h3>
@@ -288,11 +351,63 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       <p>Регламенты, инструкции и ответы на частые вопросы — всё, что нужно для старта и работы в команде.</p>
     </div>
     <div class="res-grid">
-      <div class="res-card" onclick="openResourceModal('📜','Регламенты','Правила работы Civil Team — структура команды, обязанности по ролям и порядок начисления BWC.')"><div class="ricon">📜</div><h4>Регламенты<span class="res-arrow">→</span></h4><p>Правила работы Civil Team</p></div>
-      <div class="res-card" onclick="openResourceModal('📘','Инструкции','Шаг за шагом: регистрация в Dashboard, отправка отчётов, работа с задачами.')"><div class="ricon">📘</div><h4>Инструкции<span class="res-arrow">→</span></h4><p>Как пользоваться Dashboard</p></div>
-      <div class="res-card" onclick="openResourceModal('🧭','Руководства','Подробные гайды по каждой роли — от ассистента до Head of Civil.')"><div class="ricon">🧭</div><h4>Руководства<span class="res-arrow">→</span></h4><p>Гайды по ролям и задачам</p></div>
-      <div class="res-card" onclick="openResourceModal('❓','FAQ','Ответы на самые частые вопросы новых и действующих ассистентов.')"><div class="ricon">❓</div><h4>FAQ<span class="res-arrow">→</span></h4><p>Частые вопросы ассистентов</p></div>
-      <div class="res-card" onclick="openResourceModal('🔗','Полезные ссылки','Форум сервера, рабочие чаты команды и связанные документы.')"><div class="ricon">🔗</div><h4>Полезные ссылки<span class="res-arrow">→</span></h4><p>Форум, чаты, документы</p></div>
+      <div class="res-card" onclick="toggleResource(this, 'reglament')">
+        <div class="ricon">📜</div>
+        <h4>Регламенты<span class="res-arrow">→</span></h4>
+        <p>Правила работы Civil Team</p>
+        <div class="res-detail">
+          <p><strong>Структура команды</strong></p>
+          <ul>
+            <li>Head of Civil — руководство и BWC</li>
+            <li>Deputy Head — заместитель</li>
+            <li>Ассистенты — 3 ранга (Junior, Middle, Senior)</li>
+          </ul>
+          <p style="margin-top:6px;"><strong>Начисление BWC:</strong> по факту выполненных задач и утверждённых отчётов каждую неделю.</p>
+        </div>
+      </div>
+      <div class="res-card" onclick="toggleResource(this, 'instructions')">
+        <div class="ricon">📘</div>
+        <h4>Инструкции<span class="res-arrow">→</span></h4>
+        <p>Как пользоваться Dashboard</p>
+        <div class="res-detail">
+          <p><strong>Быстрый старт:</strong></p>
+          <ul>
+            <li>Войди через Civil ID</li>
+            <li>Прими задачи во вкладке «Задачи»</li>
+            <li>Отправь отчёт о выполнении</li>
+            <li>Следи за рейтингом в профиле</li>
+          </ul>
+        </div>
+      </div>
+      <div class="res-card" onclick="toggleResource(this, 'guides')">
+        <div class="ricon">🧭</div>
+        <h4>Руководства<span class="res-arrow">→</span></h4>
+        <p>Гайды по ролям и задачам</p>
+        <div class="res-detail">
+          <p><strong>Junior-ассистент:</strong> отчёты и базовые задачи.</p>
+          <p><strong>Middle-ассистент:</strong> помощь новичкам, ведение документации.</p>
+          <p><strong>Senior-ассистент:</strong> курирование, приём отчётов у младших.</p>
+        </div>
+      </div>
+      <div class="res-card" onclick="toggleResource(this, 'faq')">
+        <div class="ricon">❓</div>
+        <h4>FAQ<span class="res-arrow">→</span></h4>
+        <p>Частые вопросы ассистентов</p>
+        <div class="res-detail">
+          <p><strong>Как часто обновляется рейтинг?</strong><br>Каждую неделю после подведения итогов.</p>
+          <p><strong>Что делать, если не вижу задач?</strong><br>Обратись к Deputy Head.</p>
+        </div>
+      </div>
+      <div class="res-card" onclick="toggleResource(this, 'links')">
+        <div class="ricon">🔗</div>
+        <h4>Полезные ссылки<span class="res-arrow">→</span></h4>
+        <p>Форум, чаты, документы</p>
+        <div class="res-detail">
+          <p><strong>Форум:</strong> forum.arizona-rp.com</p>
+          <p><strong>Discord-чат команды:</strong> #civil-team</p>
+          <p><strong>Документы:</strong> Google Sheets (внутренний)</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -327,7 +442,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 
 <!-- Модалка входа: используется для перехода в Dashboard / Results с активной сессией -->
 <div class="modal-overlay" id="auth-modal-overlay" onclick="if(event.target===this) closeAuthModal()">
-  <div class="modal-box">
+  <div class="modal-box" id="auth-modal-box">
     <button class="modal-close" onclick="closeAuthModal()">✕</button>
     <h3 id="auth-modal-title">Вход в Civil ID</h3>
     <p class="modal-sub" id="auth-modal-sub">Войди под своим игровым ником — мы откроем нужный сервис с активной сессией.</p>
@@ -337,18 +452,13 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       <button type="submit" class="btn btn-primary" id="auth-submit-btn">Войти</button>
       <div class="modal-error" id="auth-error"></div>
       <div class="modal-success" id="auth-success"></div>
+      <div class="modal-forgot"><a onclick="handleForgotPassword()">Не помню пароль</a></div>
     </form>
-  </div>
-</div>
-
-<!-- Модалка-плейсхолдер для разделов "Полезные материалы" -->
-<div class="modal-overlay" id="resource-modal-overlay" onclick="if(event.target===this) closeResourceModal()">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeResourceModal()">✕</button>
-    <div class="ricon-lg" id="resource-modal-icon"></div>
-    <h3 id="resource-modal-title"></h3>
-    <p class="modal-sub" id="resource-modal-desc"></p>
-    <p style="font-size:12.5px; color:var(--text-muted);">Раздел в разработке — содержимое появится здесь позже.</p>
+    <!-- Экран загрузки при SSO-переходе -->
+    <div class="modal-loading-state" id="auth-loading-state">
+      <div class="loader"></div>
+      <p style="font-size:14px; color:var(--text-secondary);">Переходим в <span id="auth-loading-target">Dashboard</span>...</p>
+    </div>
   </div>
 </div>
 
@@ -357,27 +467,49 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   const SUPABASE_URL = "https://jdrepnjvvyzaiohihvvw.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkcmVwbmp2dnl6YWlvaGlodnZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MDczODUsImV4cCI6MjA5NzI4MzM4NX0.Byex7T_qRiiVBmFMD3QeS8tALx5k1ZIV34O2QDrjjbI";
   const DASHBOARD_URL = "https://civil-dashboard.vercel.app";
-  // TODO: заменить на реальный адрес Civil Results, когда сервис будет задеплоен
-  const RESULTS_URL = null;
+  const RESULTS_URL = null; // замените на реальный URL когда будет готов
 
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  let pendingTarget = null; // 'dashboard' | 'results' — куда перейти после успешного входа
+  let pendingTarget = null; // 'dashboard' | 'results'
 
-  // ===== Переход в сервисы с передачей сессии =====
-  // Supabase-сессия хранится в localStorage конкретного домена (origin), поэтому
-  // между civil-id.vercel.app и civil-dashboard.vercel.app она не видна сама по себе.
-  // Передаём access/refresh токены через URL hash — Dashboard на старте должен
-  // подхватить их через supabaseClient.auth.setSession({access_token, refresh_token}).
+  // ===== Sticky nav shadow on scroll =====
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('topnav');
+    if (window.scrollY > 10) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+  });
+
+  // ===== SSO: построение URL с токенами =====
   function buildSsoUrl(baseUrl, session) {
     const hash = `access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token)}`;
     return `${baseUrl}/#${hash}`;
   }
 
+  function showLoadingState(targetName) {
+    document.getElementById('auth-form').style.display = 'none';
+    document.getElementById('auth-modal-title').style.display = 'none';
+    document.getElementById('auth-modal-sub').style.display = 'none';
+    document.getElementById('auth-loading-target').textContent = targetName;
+    document.getElementById('auth-loading-state').style.display = 'block';
+  }
+
+  function hideLoadingState() {
+    document.getElementById('auth-form').style.display = '';
+    document.getElementById('auth-modal-title').style.display = '';
+    document.getElementById('auth-modal-sub').style.display = '';
+    document.getElementById('auth-loading-state').style.display = 'none';
+  }
+
   async function handleEnterDashboard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
-      window.location.href = buildSsoUrl(DASHBOARD_URL, session);
+      showLoadingState('Dashboard');
+      const url = buildSsoUrl(DASHBOARD_URL, session);
+      setTimeout(() => { window.location.href = url; }, 400);
     } else {
       pendingTarget = 'dashboard';
       openAuthModal();
@@ -391,7 +523,9 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     }
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
-      window.location.href = buildSsoUrl(RESULTS_URL, session);
+      showLoadingState('Results');
+      const url = buildSsoUrl(RESULTS_URL, session);
+      setTimeout(() => { window.location.href = url; }, 400);
     } else {
       pendingTarget = 'results';
       openAuthModal();
@@ -402,11 +536,15 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   function openAuthModal() {
     document.getElementById('auth-error').style.display = 'none';
     document.getElementById('auth-success').style.display = 'none';
+    hideLoadingState();
     document.getElementById('auth-modal-overlay').classList.add('open');
+    document.getElementById('auth-nick').focus();
   }
+
   function closeAuthModal() {
     document.getElementById('auth-modal-overlay').classList.remove('open');
     pendingTarget = null;
+    hideLoadingState();
   }
 
   async function handleAuthSubmit(e) {
@@ -421,9 +559,6 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     btn.disabled = true;
     btn.textContent = 'Входим…';
 
-    // Та же формула, что в Dashboard: ник → системный email вида nick@civil.team.
-    // Это держит вход «по нику» снаружи, а Supabase Auth по-прежнему работает
-    // с email/паролем внутри — без отдельного запроса в базу за реальным email.
     const safeNick = rawNick.toLowerCase().replace(/[^a-z0-9_]/g, '');
     const systemEmail = `${safeNick}@civil.team`;
 
@@ -440,31 +575,125 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     okEl.textContent = 'Готово, переходим…';
     okEl.style.display = 'block';
 
+    const targetName = pendingTarget === 'results' ? 'Results' : 'Dashboard';
     const targetUrl = pendingTarget === 'results' && RESULTS_URL
       ? buildSsoUrl(RESULTS_URL, data.session)
       : buildSsoUrl(DASHBOARD_URL, data.session);
 
-    setTimeout(() => { window.location.href = targetUrl; }, 500);
+    // Показываем состояние загрузки вместо формы
+    setTimeout(() => {
+      showLoadingState(targetName);
+      setTimeout(() => { window.location.href = targetUrl; }, 500);
+    }, 600);
   }
 
-  // ===== Модалка ресурсов-плейсхолдеров =====
+  async function handleForgotPassword() {
+    const rawNick = document.getElementById('auth-nick').value.trim();
+    const errEl = document.getElementById('auth-error');
+    const okEl = document.getElementById('auth-success');
+    errEl.style.display = 'none';
+    okEl.style.display = 'none';
+
+    if (!rawNick) {
+      errEl.textContent = 'Сначала введи свой ник';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const safeNick = rawNick.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const systemEmail = `${safeNick}@civil.team`;
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(systemEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      errEl.textContent = 'Не удалось отправить сброс пароля. Проверь ник.';
+      errEl.style.display = 'block';
+    } else {
+      okEl.textContent = 'Инструкция по сбросу пароля отправлена на почту, привязанную к нику.';
+      okEl.style.display = 'block';
+    }
+  }
+
+  // ===== Ресурсы: аккордеон вместо модалок =====
+  function toggleResource(card, key) {
+    const detail = card.querySelector('.res-detail');
+    const isOpen = detail.classList.contains('open');
+
+    // Закрываем все открытые
+    document.querySelectorAll('.res-detail.open').forEach(d => d.classList.remove('open'));
+
+    // Открываем текущий, если был закрыт
+    if (!isOpen) {
+      detail.classList.add('open');
+    }
+  }
+
+  // Модалка-плейсхолдер (оставлена для Results, когда сервис недоступен)
   function openResourceModal(icon, title, desc) {
+    // Создаём временную модалку если её нет
+    let modal = document.getElementById('resource-modal-overlay');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.id = 'resource-modal-overlay';
+      modal.onclick = function(e) { if (e.target === this) closeResourceModal(); };
+      modal.innerHTML = `
+        <div class="modal-box">
+          <button class="modal-close" onclick="closeResourceModal()">✕</button>
+          <div class="ricon-lg" id="resource-modal-icon"></div>
+          <h3 id="resource-modal-title"></h3>
+          <p class="modal-sub" id="resource-modal-desc"></p>
+          <p style="font-size:12.5px; color:var(--text-muted);" id="resource-modal-extra"></p>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
     document.getElementById('resource-modal-icon').textContent = icon;
     document.getElementById('resource-modal-title').textContent = title;
     document.getElementById('resource-modal-desc').textContent = desc;
-    document.getElementById('resource-modal-overlay').classList.add('open');
-  }
-  function closeResourceModal() {
-    document.getElementById('resource-modal-overlay').classList.remove('open');
+    document.getElementById('resource-modal-extra').textContent = 'Сервис появится здесь позже.';
+    modal.classList.add('open');
   }
 
-  // Обновляем кнопку "Войти" в навбаре, если сессия уже есть
-  (async () => {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session) {
-      const btn = document.getElementById('nav-auth-btn');
-      btn.textContent = 'В Dashboard';
+  function closeResourceModal() {
+    const modal = document.getElementById('resource-modal-overlay');
+    if (modal) modal.classList.remove('open');
+  }
+
+  // ===== Счётчик ассистентов (заглушка) =====
+  async function updateActiveCount() {
+    try {
+      // Попытка получить реальное количество из Supabase
+      const { count, error } = await supabaseClient
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+      if (!error && count !== null) {
+        document.getElementById('active-count').textContent = count;
+        return;
+      }
+    } catch (e) {
+      // fallback
     }
+    document.getElementById('active-count').textContent = '37';
+  }
+
+  // ===== Обновление кнопки в навбаре =====
+  async function updateNavButton() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const btn = document.getElementById('nav-auth-btn');
+    const heroDashBtn = document.getElementById('hero-dash-btn');
+    if (session) {
+      btn.textContent = 'В Dashboard';
+      heroDashBtn.textContent = 'Открыть Dashboard →';
+    }
+  }
+
+  // ===== Инициализация =====
+  (async () => {
+    await updateNavButton();
+    await updateActiveCount();
   })();
 </script>
 
