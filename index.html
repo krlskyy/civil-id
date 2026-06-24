@@ -176,22 +176,6 @@ section{ padding: 80px 28px; border-bottom: 1px solid var(--border-soft); }
 .res-card:hover h4 .res-arrow{ opacity:1; transform:none; color: var(--accent-hover); }
 .res-card p{ font-size:12.5px; color: var(--text-muted); }
 
-/* Resource accordion inside cards */
-.res-detail{
-  max-height:0; overflow:hidden;
-  transition: max-height 0.35s ease, margin-top 0.35s ease;
-  font-size:12.5px; color: var(--text-secondary);
-  border-top: 1px solid transparent;
-}
-.res-detail.open{
-  max-height:200px; margin-top:10px;
-  border-top-color: var(--border-soft);
-  padding-top:10px;
-}
-.res-detail p{ margin-bottom:6px; }
-.res-detail ul{ padding-left:18px; color: var(--text-muted); font-size:12px; }
-.res-detail ul li{ margin-bottom:4px; }
-
 /* ===== TEAM ===== */
 .team-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .team-card{
@@ -254,10 +238,59 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 .modal-loading-state .loader{ width:32px; height:32px; border:3px solid var(--border); border-top-color: var(--accent); border-radius:50%; animation: spin 0.7s linear infinite; margin: 0 auto 14px; }
 @keyframes spin{ to{ transform: rotate(360deg); } }
 
+/* ===== MATERIAL PAGE MODAL ===== */
+.material-page-overlay{
+  position:fixed; inset:0; background: rgba(5,5,6,0.85); backdrop-filter: blur(8px);
+  display:none; align-items:center; justify-content:center; z-index:300; padding: 20px;
+}
+.material-page-overlay.open{ display:flex; }
+.material-page{
+  background: var(--bg-surface); border:1px solid var(--border); border-radius: var(--radius-lg);
+  max-width: 640px; width:100%; max-height: 85vh; overflow-y:auto;
+  padding: 40px 32px; position:relative;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+  animation: materialIn 0.25s ease;
+}
+@keyframes materialIn{
+  from{ opacity:0; transform: translateY(12px) scale(0.97); }
+  to{ opacity:1; transform:none; }
+}
+.material-page .material-close{
+  position:absolute; top:20px; right:20px; background:none; border:none;
+  color: var(--text-muted); font-size:20px; cursor:pointer; line-height:1;
+}
+.material-page .material-close:hover{ color: var(--text-primary); }
+.material-page .material-icon{ font-size:36px; margin-bottom:18px; }
+.material-page h2{
+  font-family: var(--font-display); font-weight:600; font-size:28px;
+  margin-bottom:10px; letter-spacing:-0.01em;
+}
+.material-page .material-subtitle{
+  font-size:14px; color: var(--text-secondary); margin-bottom:28px;
+  padding-bottom:20px; border-bottom:1px solid var(--border-soft);
+}
+.material-page .material-content{
+  font-size:14px; line-height:1.7; color: var(--text-secondary);
+}
+.material-page .material-content h3{
+  font-family: var(--font-body); font-weight:600; font-size:15px;
+  color: var(--text-primary); margin: 22px 0 10px;
+}
+.material-page .material-content ul{
+  padding-left:20px; margin-bottom:16px;
+}
+.material-page .material-content ul li{
+  margin-bottom:6px; color: var(--text-muted);
+}
+.material-page .material-content p{
+  margin-bottom:12px;
+}
+
 @media (max-width: 760px){
   .topnav nav{ display:none; }
   .portal-row{ grid-template-columns: 1fr; }
   .about-grid, .team-grid{ grid-template-columns: 1fr; }
+  .material-page{ padding: 28px 22px; }
 }
 </style>
 </head>
@@ -286,7 +319,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       <button class="btn btn-secondary" id="hero-results-btn" onclick="handleEnterResults()">Открыть Results</button>
     </div>
     <div class="hero-stats">
-      <div class="stat-badge"><span class="stat-dot"></span> <span id="active-count">—</span> ассистентов в системе</div>
+      <div class="stat-badge"><span class="stat-dot"></span> <span id="active-count">…</span> ассистентов в системе</div>
     </div>
 
     <div class="portal-row" id="services">
@@ -351,62 +384,30 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       <p>Регламенты, инструкции и ответы на частые вопросы — всё, что нужно для старта и работы в команде.</p>
     </div>
     <div class="res-grid">
-      <div class="res-card" onclick="toggleResource(this, 'reglament')">
+      <div class="res-card" onclick="openMaterialPage('reglament')">
         <div class="ricon">📜</div>
         <h4>Регламенты<span class="res-arrow">→</span></h4>
         <p>Правила работы Civil Team</p>
-        <div class="res-detail">
-          <p><strong>Структура команды</strong></p>
-          <ul>
-            <li>Head of Civil — руководство и BWC</li>
-            <li>Deputy Head — заместитель</li>
-            <li>Ассистенты — 3 ранга (Junior, Middle, Senior)</li>
-          </ul>
-          <p style="margin-top:6px;"><strong>Начисление BWC:</strong> по факту выполненных задач и утверждённых отчётов каждую неделю.</p>
-        </div>
       </div>
-      <div class="res-card" onclick="toggleResource(this, 'instructions')">
+      <div class="res-card" onclick="openMaterialPage('instructions')">
         <div class="ricon">📘</div>
         <h4>Инструкции<span class="res-arrow">→</span></h4>
         <p>Как пользоваться Dashboard</p>
-        <div class="res-detail">
-          <p><strong>Быстрый старт:</strong></p>
-          <ul>
-            <li>Войди через Civil ID</li>
-            <li>Прими задачи во вкладке «Задачи»</li>
-            <li>Отправь отчёт о выполнении</li>
-            <li>Следи за рейтингом в профиле</li>
-          </ul>
-        </div>
       </div>
-      <div class="res-card" onclick="toggleResource(this, 'guides')">
+      <div class="res-card" onclick="openMaterialPage('guides')">
         <div class="ricon">🧭</div>
         <h4>Руководства<span class="res-arrow">→</span></h4>
         <p>Гайды по ролям и задачам</p>
-        <div class="res-detail">
-          <p><strong>Junior-ассистент:</strong> отчёты и базовые задачи.</p>
-          <p><strong>Middle-ассистент:</strong> помощь новичкам, ведение документации.</p>
-          <p><strong>Senior-ассистент:</strong> курирование, приём отчётов у младших.</p>
-        </div>
       </div>
-      <div class="res-card" onclick="toggleResource(this, 'faq')">
+      <div class="res-card" onclick="openMaterialPage('faq')">
         <div class="ricon">❓</div>
         <h4>FAQ<span class="res-arrow">→</span></h4>
         <p>Частые вопросы ассистентов</p>
-        <div class="res-detail">
-          <p><strong>Как часто обновляется рейтинг?</strong><br>Каждую неделю после подведения итогов.</p>
-          <p><strong>Что делать, если не вижу задач?</strong><br>Обратись к Deputy Head.</p>
-        </div>
       </div>
-      <div class="res-card" onclick="toggleResource(this, 'links')">
+      <div class="res-card" onclick="openMaterialPage('links')">
         <div class="ricon">🔗</div>
         <h4>Полезные ссылки<span class="res-arrow">→</span></h4>
         <p>Форум, чаты, документы</p>
-        <div class="res-detail">
-          <p><strong>Форум:</strong> forum.arizona-rp.com</p>
-          <p><strong>Discord-чат команды:</strong> #civil-team</p>
-          <p><strong>Документы:</strong> Google Sheets (внутренний)</p>
-        </div>
       </div>
     </div>
   </div>
@@ -440,7 +441,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 
 <footer class="site-footer">CIVIL ID — PORTAL</footer>
 
-<!-- Модалка входа: используется для перехода в Dashboard / Results с активной сессией -->
+<!-- Модалка входа -->
 <div class="modal-overlay" id="auth-modal-overlay" onclick="if(event.target===this) closeAuthModal()">
   <div class="modal-box" id="auth-modal-box">
     <button class="modal-close" onclick="closeAuthModal()">✕</button>
@@ -454,11 +455,21 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       <div class="modal-success" id="auth-success"></div>
       <div class="modal-forgot"><a onclick="handleForgotPassword()">Не помню пароль</a></div>
     </form>
-    <!-- Экран загрузки при SSO-переходе -->
     <div class="modal-loading-state" id="auth-loading-state">
       <div class="loader"></div>
       <p style="font-size:14px; color:var(--text-secondary);">Переходим в <span id="auth-loading-target">Dashboard</span>...</p>
     </div>
+  </div>
+</div>
+
+<!-- Модалка-страница для материалов -->
+<div class="material-page-overlay" id="material-page-overlay" onclick="if(event.target===this) closeMaterialPage()">
+  <div class="material-page">
+    <button class="material-close" onclick="closeMaterialPage()">✕</button>
+    <div class="material-icon" id="material-icon"></div>
+    <h2 id="material-title"></h2>
+    <p class="material-subtitle" id="material-subtitle"></p>
+    <div class="material-content" id="material-content"></div>
   </div>
 </div>
 
@@ -483,7 +494,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     }
   });
 
-  // ===== SSO: построение URL с токенами =====
+  // ===== SSO =====
   function buildSsoUrl(baseUrl, session) {
     const hash = `access_token=${encodeURIComponent(session.access_token)}&refresh_token=${encodeURIComponent(session.refresh_token)}`;
     return `${baseUrl}/#${hash}`;
@@ -508,8 +519,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
       showLoadingState('Dashboard');
-      const url = buildSsoUrl(DASHBOARD_URL, session);
-      setTimeout(() => { window.location.href = url; }, 400);
+      setTimeout(() => { window.location.href = buildSsoUrl(DASHBOARD_URL, session); }, 400);
     } else {
       pendingTarget = 'dashboard';
       openAuthModal();
@@ -518,14 +528,13 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 
   async function handleEnterResults() {
     if (!RESULTS_URL) {
-      openResourceModal('🏆', 'Civil Results', 'Сервис скоро будет доступен — здесь появятся еженедельные итоги команды.');
+      openMaterialPage('results-unavailable'); // покажем заглушку через страницу материалов
       return;
     }
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
       showLoadingState('Results');
-      const url = buildSsoUrl(RESULTS_URL, session);
-      setTimeout(() => { window.location.href = url; }, 400);
+      setTimeout(() => { window.location.href = buildSsoUrl(RESULTS_URL, session); }, 400);
     } else {
       pendingTarget = 'results';
       openAuthModal();
@@ -580,7 +589,6 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       ? buildSsoUrl(RESULTS_URL, data.session)
       : buildSsoUrl(DASHBOARD_URL, data.session);
 
-    // Показываем состояние загрузки вместо формы
     setTimeout(() => {
       showLoadingState(targetName);
       setTimeout(() => { window.location.href = targetUrl; }, 500);
@@ -616,56 +624,114 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     }
   }
 
-  // ===== Ресурсы: аккордеон вместо модалок =====
-  function toggleResource(card, key) {
-    const detail = card.querySelector('.res-detail');
-    const isOpen = detail.classList.contains('open');
-
-    // Закрываем все открытые
-    document.querySelectorAll('.res-detail.open').forEach(d => d.classList.remove('open'));
-
-    // Открываем текущий, если был закрыт
-    if (!isOpen) {
-      detail.classList.add('open');
+  // ===== Содержимое страниц материалов =====
+  const materialPages = {
+    'reglament': {
+      icon: '📜',
+      title: 'Регламенты Civil Team',
+      subtitle: 'Официальные правила работы команды ассистентов.',
+      content: `
+        <h3>Структура команды</h3>
+        <ul>
+          <li><strong>Head of Civil</strong> — руководство, распределение BWC, утверждение итогов.</li>
+          <li><strong>Deputy Head</strong> — заместитель, контроль выполнения задач.</li>
+          <li><strong>Ассистенты</strong> — три ранга: Junior, Middle, Senior.</li>
+        </ul>
+        <h3>Порядок начисления BWC</h3>
+        <p>Баллы BWC начисляются еженедельно по факту выполненных задач и утверждённых отчётов. Ставка зависит от ранга и качества работы.</p>
+        <h3>Обязанности ассистентов</h3>
+        <p>Своевременная регистрация отчётов, выполнение назначенных задач, соблюдение сроков. За систематические нарушения — понижение ранга или исключение.</p>
+      `
+    },
+    'instructions': {
+      icon: '📘',
+      title: 'Инструкции',
+      subtitle: 'Как начать работу с Civil Dashboard.',
+      content: `
+        <h3>Быстрый старт</h3>
+        <ul>
+          <li>Войди через Civil ID, используя игровой ник.</li>
+          <li>Прими доступные задачи в разделе «Задачи».</li>
+          <li>После выполнения — отправь отчёт через форму.</li>
+          <li>Следи за рейтингом и прогрессом в профиле.</li>
+        </ul>
+        <h3>Регистрация первого отчёта</h3>
+        <p>Выбери задачу, нажми «Выполнено», заполни описание проделанной работы и прикрепи доказательства (скриншоты, ссылки). Отчёт будет рассмотрен руководством.</p>
+      `
+    },
+    'guides': {
+      icon: '🧭',
+      title: 'Руководства по ролям',
+      subtitle: 'Гайды для каждого ранга ассистента.',
+      content: `
+        <h3>Junior-ассистент</h3>
+        <p>Базовые задачи: помощь игрокам, патрулирование, регистрация отчётов. Минимум 2 отчёта в неделю.</p>
+        <h3>Middle-ассистент</h3>
+        <p>Помощь новичкам, ведение документации, участие в обсуждениях. Может проверять отчёты Junior.</p>
+        <h3>Senior-ассистент</h3>
+        <p>Курирование младших ассистентов, приём отчётов, прямая связь с Deputy Head. Допуск к голосованиям по BWC.</p>
+      `
+    },
+    'faq': {
+      icon: '❓',
+      title: 'Часто задаваемые вопросы',
+      subtitle: 'Быстрые ответы для новых и действующих ассистентов.',
+      content: `
+        <h3>Как часто обновляется рейтинг?</h3>
+        <p>Каждую неделю после подведения итогов в Civil Results.</p>
+        <h3>Что делать, если не вижу задач?</h3>
+        <p>Обратись к Deputy Head или проверь свой ранг — некоторые задачи доступны только Senior.</p>
+        <h3>Можно ли сменить ник?</h3>
+        <p>Ник привязан к аккаунту сервера. Для смены необходимо обратиться к Head of Civil.</p>
+      `
+    },
+    'links': {
+      icon: '🔗',
+      title: 'Полезные ссылки',
+      subtitle: 'Ресурсы команды и связанные сервисы.',
+      content: `
+        <h3>Форум сервера</h3>
+        <p>forum.arizona-rp.com — раздел Civil Team.</p>
+        <h3>Discord-чат команды</h3>
+        <p>Канал #civil-team на основном сервере Discord.</p>
+        <h3>Google Документы</h3>
+        <p>Внутренние таблицы и регламенты (доступ по запросу).</p>
+      `
+    },
+    'results-unavailable': {
+      icon: '🏆',
+      title: 'Civil Results',
+      subtitle: 'Сервис еженедельных итогов.',
+      content: '<p>Сервис скоро будет доступен — здесь появятся еженедельные итоги команды.</p>'
     }
+  };
+
+  function openMaterialPage(key) {
+    const page = materialPages[key];
+    if (!page) return;
+    document.getElementById('material-icon').textContent = page.icon;
+    document.getElementById('material-title').textContent = page.title;
+    document.getElementById('material-subtitle').textContent = page.subtitle;
+    document.getElementById('material-content').innerHTML = page.content;
+    document.getElementById('material-page-overlay').classList.add('open');
   }
 
-  // Модалка-плейсхолдер (оставлена для Results, когда сервис недоступен)
-  function openResourceModal(icon, title, desc) {
-    // Создаём временную модалку если её нет
-    let modal = document.getElementById('resource-modal-overlay');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.className = 'modal-overlay';
-      modal.id = 'resource-modal-overlay';
-      modal.onclick = function(e) { if (e.target === this) closeResourceModal(); };
-      modal.innerHTML = `
-        <div class="modal-box">
-          <button class="modal-close" onclick="closeResourceModal()">✕</button>
-          <div class="ricon-lg" id="resource-modal-icon"></div>
-          <h3 id="resource-modal-title"></h3>
-          <p class="modal-sub" id="resource-modal-desc"></p>
-          <p style="font-size:12.5px; color:var(--text-muted);" id="resource-modal-extra"></p>
-        </div>
-      `;
-      document.body.appendChild(modal);
+  function closeMaterialPage() {
+    document.getElementById('material-page-overlay').classList.remove('open');
+  }
+
+  // Закрытие по Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeMaterialPage();
+      closeAuthModal();
     }
-    document.getElementById('resource-modal-icon').textContent = icon;
-    document.getElementById('resource-modal-title').textContent = title;
-    document.getElementById('resource-modal-desc').textContent = desc;
-    document.getElementById('resource-modal-extra').textContent = 'Сервис появится здесь позже.';
-    modal.classList.add('open');
-  }
+  });
 
-  function closeResourceModal() {
-    const modal = document.getElementById('resource-modal-overlay');
-    if (modal) modal.classList.remove('open');
-  }
-
-  // ===== Счётчик ассистентов (заглушка) =====
+  // ===== Реальный счётчик ассистентов =====
   async function updateActiveCount() {
     try {
-      // Попытка получить реальное количество из Supabase
+      // Попытка получить количество активных ассистентов из таблицы profiles
       const { count, error } = await supabaseClient
         .from('profiles')
         .select('*', { count: 'exact', head: true });
@@ -674,9 +740,10 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
         return;
       }
     } catch (e) {
-      // fallback
+      // fallback — оставляем заглушку или 0
     }
-    document.getElementById('active-count').textContent = '37';
+    // Если запрос не удался, показываем 0
+    document.getElementById('active-count').textContent = '0';
   }
 
   // ===== Обновление кнопки в навбаре =====
