@@ -851,17 +851,26 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     const countEl = document.getElementById('active-count');
     const teamCountEl = document.getElementById('team-count');
     try {
-      const { count, error } = await supabaseClient
-        .from('assistants')
-        .select('*', { count: 'exact', head: true });
-      if (!error && count !== null) {
-        animateValue(countEl, 0, count, 800);
-        if (teamCountEl) teamCountEl.textContent = count;
+      // RPC вместо прямого select: анонимный посетитель Civil ID не имеет
+      // прав на select из assistants по RLS, но эта функция безопасно
+      // отдаёт только число — без раскрытия чьих-либо данных.
+      const { data, error } = await supabaseClient.rpc('get_assistant_count');
+      if (error) {
+        console.error('updateActiveCount: RPC error —', error.message, error);
+        countEl.textContent = '—';
+        if (teamCountEl) teamCountEl.textContent = '—';
         return;
       }
-    } catch (e) {}
-    animateValue(countEl, 0, 0, 400);
-    if (teamCountEl) teamCountEl.textContent = '0';
+      if (data !== null) {
+        animateValue(countEl, 0, data, 800);
+        if (teamCountEl) teamCountEl.textContent = data;
+        return;
+      }
+    } catch (e) {
+      console.error('updateActiveCount: network/exception —', e);
+    }
+    countEl.textContent = '—';
+    if (teamCountEl) teamCountEl.textContent = '—';
   }
 
   function animateValue(el, start, end, duration) {
@@ -904,14 +913,19 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     const dot = document.getElementById('status-dot');
     const text = document.getElementById('status-text');
     try {
-      const res = await fetch(`${SUPABASE_URL}/auth/v1/health`, { method: 'GET', cache: 'no-store' });
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: { apikey: SUPABASE_ANON_KEY }
+      });
       if (res.ok) {
         dot.style.background = 'var(--role-manager)';
         text.textContent = 'Все системы работают';
       } else {
-        throw new Error('not ok');
+        throw new Error('status ' + res.status);
       }
     } catch (e) {
+      console.error('checkSystemStatus failed:', e);
       dot.style.background = 'var(--danger)';
       text.textContent = 'Возможны сбои';
     }
