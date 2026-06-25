@@ -27,6 +27,8 @@
   --gold: #D4AF6A;
   --gold-soft: rgba(212,175,106,0.12);
 
+  --danger: #E5484D;
+
   --role-head: #C81E4D;
   --role-deputy: #B5793A;
   --role-founder: #6E6CD9;
@@ -132,7 +134,8 @@ a{ color: inherit; text-decoration: none; }
 .hero h1 em{ font-style:italic; font-weight:500; color: var(--accent-hover); }
 .hero .lede{ font-size: 17px; color: var(--text-secondary); max-width: 540px; margin: 0 auto 40px; }
 .hero-ctas{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
-.hero-stats{ margin-bottom: 48px; }
+.hero-stats{ margin-bottom: 48px; display:flex; justify-content:center; flex-wrap:wrap; gap:10px; }
+.hero-stats .stat-badge{ margin-left:0 !important; }
 .hero-stats .stat-badge{
   display:inline-flex; align-items:center; gap:8px;
   font-family: var(--font-mono); font-size:12px;
@@ -237,6 +240,8 @@ section{ padding: 80px 28px; border-bottom: 1px solid var(--border-soft); }
   opacity:0; pointer-events:none; transition:0.2s;
 }
 .team-card:hover .role-tooltip{ opacity:1; }
+.team-footnote{ text-align:center; margin-top:24px; font-size:13px; color: var(--text-muted); }
+.team-footnote span{ color: var(--accent-hover); font-weight:600; font-family: var(--font-mono); }
 
 /* ===== FOOTER CTA ===== */
 .final-cta{ text-align:center; padding: 90px 28px; }
@@ -244,6 +249,19 @@ section{ padding: 80px 28px; border-bottom: 1px solid var(--border-soft); }
 .final-cta p{ color: var(--text-secondary); margin-bottom:32px; }
 
 footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--font-mono); font-size:11.5px; color: var(--text-muted); letter-spacing:0.04em; }
+
+.scroll-top-btn{
+  position:fixed; bottom:24px; right:24px; z-index:60;
+  width:42px; height:42px; border-radius:50%;
+  background: var(--bg-surface-raised); border:1px solid var(--border);
+  color: var(--text-secondary); font-size:17px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transform: translateY(8px);
+  transition: opacity .2s, transform .2s, border-color .2s, color .2s;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+}
+.scroll-top-btn.show{ opacity:1; pointer-events:auto; transform:none; }
+.scroll-top-btn:hover{ border-color: var(--accent-border); color: var(--accent-hover); }
 
 /* ===== MODAL ===== */
 .modal-overlay{ position:fixed; inset:0; background: rgba(5,5,6,0.72); backdrop-filter: blur(6px); display:none; align-items:center; justify-content:center; z-index:200; padding: 20px; }
@@ -262,6 +280,10 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
 .field input:focus{ outline:none; border-color: var(--accent-border); box-shadow: 0 0 0 3px var(--accent-soft); }
 .field input.input-error{ border-color: #e5484d; }
 .field .field-hint{ font-size:11px; color:#e5484d; margin-top:2px; display:none; }
+.password-wrap{ position:relative; }
+.password-wrap input{ padding-right:40px; }
+.password-toggle{ position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:15px; opacity:0.55; padding:6px; line-height:1; transition: opacity .15s; }
+.password-toggle:hover{ opacity:0.9; }
 
 .modal-box .btn-primary{ width:100%; justify-content:center; margin-top:6px; }
 .modal-error{ font-size:12.5px; color: #e5484d; margin-top:10px; display:none; }
@@ -375,6 +397,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     </div>
     <div class="hero-stats">
       <div class="stat-badge"><span class="stat-dot"></span> <span id="active-count">0</span> ассистентов зарегистрировано</div>
+      <div class="stat-badge" id="status-badge"><span class="stat-dot" id="status-dot"></span> <span id="status-text">Проверяем статус…</span></div>
     </div>
 
     <div class="portal-row" id="services">
@@ -474,6 +497,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
         <div class="role-tooltip">Полный доступ — управление командой</div>
       </div>
     </div>
+    <div class="team-footnote">и команда из <span id="team-count">…</span> ассистентов под руководством Head of Civil</div>
   </div>
 </section>
 
@@ -484,6 +508,8 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     <button class="btn btn-primary" onclick="handleEnterDashboard()">Перейти в Dashboard →</button>
   </div>
 </div>
+
+<button class="scroll-top-btn" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Наверх">↑</button>
 
 <footer class="site-footer">CIVIL ID — PORTAL</footer>
 
@@ -499,12 +525,18 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
         <input type="text" id="auth-nick" required placeholder="Введи свой ник" autocomplete="username" oninput="validateNickInput()">
         <span class="field-hint" id="nick-hint">Допустимы только латинские буквы, цифры и _</span>
       </div>
-      <div class="field"><label>Пароль</label><input type="password" id="auth-password" required placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="field">
+        <label>Пароль</label>
+        <div class="password-wrap">
+          <input type="password" id="auth-password" required placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="password-toggle" id="password-toggle" aria-label="Показать пароль" onclick="togglePasswordVisibility()">👁</button>
+        </div>
+      </div>
       <button type="submit" class="btn btn-primary" id="auth-submit-btn">Войти</button>
       <div class="modal-error" id="auth-error"></div>
       <div class="modal-success" id="auth-success"></div>
-      <div class="modal-forgot"><a onclick="handleForgotPassword()">Не помню пароль</a></div>
     </form>
+    <p class="modal-forgot">Забыл пароль? <span style="color:var(--text-secondary); cursor:default;">Обратись к Head of Civil.</span></p>
     <div class="modal-loading-state" id="auth-loading-state">
       <div class="loader"></div>
       <p style="font-size:14px; color:var(--text-secondary);">Переходим в <span id="auth-loading-target">Dashboard</span>...</p>
@@ -542,6 +574,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   // ===== Sticky nav shadow =====
   window.addEventListener('scroll', () => {
     document.getElementById('topnav').classList.toggle('scrolled', window.scrollY > 10);
+    document.getElementById('scroll-top-btn').classList.toggle('show', window.scrollY > 600);
   });
 
   // ===== Мобильное меню =====
@@ -645,6 +678,14 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     }
   }
 
+  function togglePasswordVisibility() {
+    const input = document.getElementById('auth-password');
+    const btn = document.getElementById('password-toggle');
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    btn.textContent = showing ? '👁' : '🙈';
+  }
+
   async function handleAuthSubmit(e) {
     e.preventDefault();
     const rawNick = document.getElementById('auth-nick').value.trim();
@@ -689,35 +730,6 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       showLoadingState(targetName);
       setTimeout(() => { window.location.href = targetUrl; }, 500);
     }, 600);
-  }
-
-  async function handleForgotPassword() {
-    const rawNick = document.getElementById('auth-nick').value.trim();
-    const errEl = document.getElementById('auth-error');
-    const okEl = document.getElementById('auth-success');
-    errEl.style.display = 'none';
-    okEl.style.display = 'none';
-
-    if (!rawNick || !/^[a-z0-9_]+$/i.test(rawNick)) {
-      errEl.textContent = 'Введи корректный ник';
-      errEl.style.display = 'block';
-      return;
-    }
-
-    const safeNick = rawNick.toLowerCase().replace(/[^a-z0-9_]/g, '');
-    const systemEmail = `${safeNick}@civil.team`;
-
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(systemEmail, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-
-    if (error) {
-      errEl.textContent = 'Не удалось отправить сброс пароля. Проверь ник.';
-      errEl.style.display = 'block';
-    } else {
-      okEl.textContent = 'Инструкция по сбросу пароля отправлена на почту, привязанную к нику.';
-      okEl.style.display = 'block';
-    }
   }
 
   // ===== Материалы (страницы) =====
@@ -787,7 +799,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       subtitle: 'Ресурсы команды и связанные сервисы.',
       content: `
         <h3>Форум сервера</h3>
-        <p>forum.arizona-rp.com — раздел Civil Team.</p>
+        <p>Ссылка будет добавлена.</p>
         <h3>Discord-чат команды</h3>
         <p>Канал #civil-team на основном сервере Discord.</p>
         <h3>Google Документы</h3>
@@ -837,16 +849,19 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   // ===== Счётчик зарегистрированных ассистентов =====
   async function updateActiveCount() {
     const countEl = document.getElementById('active-count');
+    const teamCountEl = document.getElementById('team-count');
     try {
       const { count, error } = await supabaseClient
         .from('assistants')
         .select('*', { count: 'exact', head: true });
       if (!error && count !== null) {
         animateValue(countEl, 0, count, 800);
+        if (teamCountEl) teamCountEl.textContent = count;
         return;
       }
     } catch (e) {}
     animateValue(countEl, 0, 0, 400);
+    if (teamCountEl) teamCountEl.textContent = '0';
   }
 
   function animateValue(el, start, end, duration) {
@@ -882,10 +897,31 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     }
   }
 
+  // ===== Реальный статус инфраструктуры =====
+  // Проверяем доступность Supabase, на котором держится вся экосистема —
+  // это честный индикатор "всё работает", а не просто decorative dot.
+  async function checkSystemStatus() {
+    const dot = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/health`, { method: 'GET', cache: 'no-store' });
+      if (res.ok) {
+        dot.style.background = 'var(--role-manager)';
+        text.textContent = 'Все системы работают';
+      } else {
+        throw new Error('not ok');
+      }
+    } catch (e) {
+      dot.style.background = 'var(--danger)';
+      text.textContent = 'Возможны сбои';
+    }
+  }
+
   // ===== Инициализация =====
   (async () => {
     await updateNavButtons();
     await updateActiveCount();
+    checkSystemStatus();
   })();
 </script>
 
