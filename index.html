@@ -523,7 +523,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
       <div class="field">
         <label>Игровой ник</label>
         <input type="text" id="auth-nick" required placeholder="Введи свой ник" autocomplete="username" oninput="validateNickInput()">
-        <span class="field-hint" id="nick-hint">Допустимы только латинские буквы, цифры и _</span>
+        <span class="field-hint" id="nick-hint">Допустимы только латинские буквы, цифры, _ и .</span>
       </div>
       <div class="field">
         <label>Пароль</label>
@@ -668,7 +668,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   function validateNickInput() {
     const input = document.getElementById('auth-nick');
     const hint = document.getElementById('nick-hint');
-    const regex = /^[a-z0-9_]*$/i;
+    const regex = /^[a-z0-9_.]*$/i;
     if (!regex.test(input.value)) {
       input.classList.add('input-error');
       hint.style.display = 'block';
@@ -694,7 +694,7 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     const okEl = document.getElementById('auth-success');
     const btn = document.getElementById('auth-submit-btn');
 
-    if (!/^[a-z0-9_]+$/i.test(rawNick)) {
+    if (!/^[a-z0-9_.]+$/i.test(rawNick)) {
       errEl.textContent = 'Ник содержит недопустимые символы';
       errEl.style.display = 'block';
       return;
