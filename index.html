@@ -398,6 +398,8 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
     <div class="hero-stats">
       <div class="stat-badge"><span class="stat-dot"></span> <span id="active-count">0</span> ассистентов зарегистрировано</div>
       <div class="stat-badge" id="status-badge"><span class="stat-dot" id="status-dot"></span> <span id="status-text">Проверяем статус…</span></div>
+      <button onclick="runDiagnostics()" style="margin-left:10px; padding:8px 14px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text-secondary); font-size:12px; cursor:pointer;">🔧 Диагностика</button>
+      <div id="diag-output" style="margin-top:12px; font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); white-space:pre-wrap; text-align:left; max-width:600px; margin-left:auto; margin-right:auto;"></div>
     </div>
 
     <div class="portal-row" id="services">
@@ -847,30 +849,89 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   });
 
   // ===== Счётчик зарегистрированных ассистентов =====
+  async function runDiagnostics() {
+    const out = document.getElementById('diag-output');
+    let log = '';
+    const print = (s) => { log += s + '\n'; out.textContent = log; };
+
+    print('=== Тест 1: supabaseClient.rpc() ===');
+    try {
+      const { data, error } = await supabaseClient.rpc('get_assistant_count');
+      print(error ? ('FAIL: ' + error.message) : ('OK, data=' + data));
+    } catch (e) {
+      print('EXCEPTION: ' + (e && e.message ? e.message : String(e)));
+    }
+
+    print('=== Тест 2: прямой fetch к /rest/v1/rpc/ ===');
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_assistant_count`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      print('HTTP ' + res.status + ', body=' + (await res.text()).slice(0, 200));
+    } catch (e) {
+      print('EXCEPTION: ' + (e && e.message ? e.message : String(e)));
+    }
+
+    print('=== Тест 3: то же самое, что Dashboard (select assistants) ===');
+    try {
+      const { data, error, count } = await supabaseClient
+        .from('assistants')
+        .select('*', { count: 'exact', head: true });
+      print(error ? ('FAIL: ' + error.message) : ('OK, count=' + count));
+    } catch (e) {
+      print('EXCEPTION: ' + (e && e.message ? e.message : String(e)));
+    }
+
+    print('=== Тест 4: fetch к статичному внешнему URL (не Supabase) ===');
+    try {
+      const res = await fetch('https://httpbin.org/get', { method: 'GET' });
+      print('HTTP ' + res.status);
+    } catch (e) {
+      print('EXCEPTION: ' + (e && e.message ? e.message : String(e)));
+    }
+  }
+
   async function updateActiveCount() {
     const countEl = document.getElementById('active-count');
     const teamCountEl = document.getElementById('team-count');
     try {
-      // RPC вместо прямого select: анонимный посетитель Civil ID не имеет
-      // прав на select из assistants по RLS, но эта функция безопасно
-      // отдаёт только число — без раскрытия чьих-либо данных.
-      const { data, error } = await supabaseClient.rpc('get_assistant_count');
-      if (error) {
-        console.error('updateActiveCount: RPC error —', error.message, error);
+      // Прямой fetch вместо supabaseClient.rpc() — обходим SDK-обёртку,
+      // которая вызывала DataCloneError в некоторых браузерах.
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_assistant_count`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        const st = document.getElementById('status-text');
+        if (st) st.textContent = `RPC HTTP ${res.status}: ${text.slice(0, 120)}`;
         countEl.textContent = '—';
         if (teamCountEl) teamCountEl.textContent = '—';
         return;
       }
-      if (data !== null) {
+
+      const data = await res.json();
+      if (typeof data === 'number') {
         animateValue(countEl, 0, data, 800);
         if (teamCountEl) teamCountEl.textContent = data;
         return;
       }
+      countEl.textContent = '—';
+      if (teamCountEl) teamCountEl.textContent = '—';
     } catch (e) {
-      console.error('updateActiveCount: network/exception —', e);
+      const st = document.getElementById('status-text');
+      if (st) st.textContent = 'JS exception: ' + (e && e.message ? e.message : String(e));
+      countEl.textContent = '—';
+      if (teamCountEl) teamCountEl.textContent = '—';
     }
-    countEl.textContent = '—';
-    if (teamCountEl) teamCountEl.textContent = '—';
   }
 
   function animateValue(el, start, end, duration) {
@@ -935,7 +996,10 @@ footer.site-footer{ padding: 36px 28px; text-align:center; font-family: var(--fo
   (async () => {
     await updateNavButtons();
     await updateActiveCount();
-    checkSystemStatus();
+    // ВРЕМЕННО ОТКЛЮЧЕНО для диагностики: checkSystemStatus() перезаписывал
+    // бы статус-бейдж раньше, чем будет видна ошибка RPC. Включить обратно
+    // после того, как разберёмся с count.
+    // checkSystemStatus();
   })();
 </script>
 
